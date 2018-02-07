@@ -1,0 +1,67 @@
+/*https://www.templatemonster.com/website-templates/46251.html*/
+@white: #fff;
+@red: #F20000;
+@yellow: #C0A12D;
+
+html, body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+
+body{
+	font-size: 14px;
+	padding-top: 70px;
+}
+
+#header{
+	width: 100%;
+	line-height: 20px;
+	padding: 0;
+	margin: 0;
+}
+
+.wide {
+  width:100%;
+  height:300px;
+  background-image:url('../img/header_red_apple.jpg');
+  background-size:cover;
+}
+
+.nav{
+	margin-top: 5px;
+}
+
+.nav li a{
+	color: @white;
+}
+
+.nav li:hover a{
+	color: @red;
+}
+
+
+#main{
+	min-height: ~"calc(100% - 120px)"; /* 100% - header - footer */
+}
+
+.book{
+	border: 3px solid transparent;
+	border-radius: 3px;
+}
+
+.book:hover{
+	border: 3px solid @yellow;
+}
+
+#footer{
+    width: 100%;
+    line-height: 20px;
+    padding: 20px;
+}
+
+button:focus {outline:0;}
+.btn:focus,.btn:active:focus,.btn.active:focus,
+.btn.focus,.btn:active.focus,.btn.active.focus {
+    outline: none;
+}

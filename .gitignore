@@ -1,0 +1,4 @@
+.idea/
+node_modules/
+book-club.iml
+package-lock.json
