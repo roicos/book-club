@@ -54,6 +54,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 		}
     });
 
+    
    	app.get("*", function(req, res){
    		res.status(404).send("Can not find the page");
     });
