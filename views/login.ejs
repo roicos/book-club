@@ -1,9 +1,9 @@
 <% include partial/header %>
 
-<div class="col-sm-4"></div>
-<div class="col-sm-4 login-form jumbotron text-center">
-<p>Please, login here!</p>
+<div class="col-sm-2"></div>
+<div class="col-sm-8 login-form text-center">
 <form method="post" class="form-horizontal">
+    <p><%= message %></p>
     <div class="form-group">
         <label class="control-label col-sm-4" for="username">Username:</label>
         <div class="col-sm-8">
@@ -13,7 +13,7 @@
     <div class="form-group">
         <label class="control-label col-sm-4" for="password">Password:</label>
         <div class="col-sm-8">
-            <input class="form-control" type="password" name="password" id="pass" />
+            <input class="form-control" type="password" name="password" id="password" />
         </div>
     </div>
     <div class="form-group">
@@ -22,9 +22,8 @@
         </div>
     </div>
 </form>
-<br/>
-<p>If you don't have an account, please <a href="/registration">register.</a></p>
+<p>If you don't have an account, please <a href="/register">register.</a></p>
 </div>
-<div class="col-sm-4"></div>
+<div class="col-sm-2"></div>
 
 <% include partial/footer %>
