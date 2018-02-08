@@ -2,8 +2,8 @@
 
 <div class="col-sm-2"></div>
 <div class="col-sm-8 login-form text-center">
-<p><%= message %></p>
-<form method="post" class="form-horizontal">
+<p id="message"><%= message %></p>
+<form method="post" class="form-horizontal" id="registration" onsubmit="submitRegistrationForm()">
     <div class="form-group">
         <label class="control-label col-sm-4" for="username">Username:</label>
         <div class="col-sm-8">
@@ -41,10 +41,29 @@
     </div>
     <div class="form-group">
         <div class="col-sm-offset-4 col-sm-8 text-left">
-            <input class="btn btn-default" type="submit" value="Submit"/>
+            <input class="btn btn-default" onclick="submitRegistrationForm()" value="Submit"/>
         </div>
     </div>
 </form>
+
+<script>
+    function submitRegistrationForm(){
+        $.post("register",
+            {
+                username: $("#username").val(),
+                password1: $("#password1").val(),
+                password2: $("#password2").val(),
+                city: $("#city").val(),
+                state: $("#state").val(),
+            },
+            function(data, status){
+                window.location.href = data.redirect;
+            }).fail(function(data, status) {
+                $("#message").text(data.responseJSON.message);
+            });
+    }
+</script>
+
 <%if (status) { %>
     Please, login <a href="/login">here.</a>
 <% } %>

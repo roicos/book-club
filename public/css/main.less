@@ -36,19 +36,23 @@ body{
 	height: 70px;
 }
 
-.nav{
+.navbar .nav{
 	margin-top: 15px;
 }
 
-.nav li a{
-	color: @white;
+.navbar .nav li {
+	border-left: 3px solid transparent;
 }
 
-.nav li:hover {
+.navbar .nav li:hover {
 	border-left: 3px solid @red;
 }
 
-.nav li:hover a{
+.navbar .nav li a{
+	color: @white;
+}
+
+.navbar .nav li:hover a{
 	color: @black;
 }
 
@@ -94,6 +98,6 @@ form {
 	padding: 20px 0;
 }
 
-input[type="submit"]{
+input.btn{
 	font-size: 30px;
 }

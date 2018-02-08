@@ -14,7 +14,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	function handleError(error){
 		console.log(error);
-        res.status(500).send({"error" : error});
+        res.status(500).send({"message" : error});
 	}
 
 	app.use(function(req, res, next) {
@@ -88,7 +88,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 					handleError("Error to check if user exists: " + errSelect);
 				} else {
 					if(resultSelect.rows.length > 0){
-						res.status(200).send({"message" : "This usernameS is already exists.", "status" : false});
+						res.status(400).send({"message" : "This username is already exists.", "status" : false});
 					} else {
 						if(password1 == password2){
 							bcrypt.hash(password1, 10, function(err, passHash) {
@@ -98,19 +98,18 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 									} else {
 										req.session.user = resultInsert.rows[0]["id"];
 										req.session.authenticated = true;
-										res.redirect("/");
-										//res.status(200).send({"message" : "user registered: " + resultInsert.rows[0].id, "status" : true, "locals" : {"user" : resultInsert.rows[0].id}});
+										res.status(200).send({"message" : "user registered: " + resultInsert.rows[0].id, "status" : true, "redirect" : "/", "locals" : {"user" : resultInsert.rows[0].id}});
 									}
 								});
 							});
 						} else {
-							res.status(200).send({"message" : "Passwords are not the same", "status" : false});
+							res.status(400).send({"message" : "Passwords are not the same"});
 						}
 					}
 				}
 			});
 		} else {
-			res.status(200).send({"message" : "Username an city should not be empty.", "status" : false});
+			res.status(400).send({"message" : "Username and city should not be empty."});
 		}
 	});
 
