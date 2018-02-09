@@ -2,71 +2,72 @@
 
 <div class="col-sm-2"></div>
 <div class="col-sm-8 login-form text-center">
-<p id="message"><%= message %></p>
-<form method="post" class="form-horizontal" id="registration" onsubmit="submitRegistrationForm()">
-    <div class="form-group">
-        <label class="control-label col-sm-4" for="username">Username:</label>
-        <div class="col-sm-8">
-            <input class="form-control" type="text" name="username" id="username" />
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-8 text-left">
+            <p id="message"><%= message %></p>
         </div>
     </div>
-    <div class="form-group">
-        <label class="control-label col-sm-4" for="password1">Password:</label>
-        <div class="col-sm-8">
-            <input class="form-control" type="password" name="password1" id="password1" />
+    <form method="post" class="form-horizontal" id="registration">
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="username">Username:</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="username" id="username" />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-4" for="password2">Repeat password:</label>
-        <div class="col-sm-8">
-            <input class="form-control" type="password" name="password2" id="password2" />
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="password1">Password:</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="password" name="password1" id="password1" />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-4" for="city">City:</label>
-        <div class="col-sm-8">
-            <input class="form-control" type="text" name="city" id="city" />
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="password2">Repeat password:</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="password" name="password2" id="password2" />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-4" for="state">State:</label>
-        <div class="col-sm-8">
-            <select class="form-control" name="state" id="state">
-                <option value="0">-----</option>
-                <% for(var i=0; i<states.length; i++){%>
-                    <option value="<%=states[i].id%>"><%=states[i].name%></option>
-                <%}%>
-            </select>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="city">City:</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="city" id="city" />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8 text-left">
-            <input class="btn btn-default" onclick="submitRegistrationForm()" value="Submit"/>
+        <div class="form-group">
+            <label class="control-label col-sm-4" for="state">State:</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="state" id="state">
+                    <option value="0">-----</option>
+                    <% for(var i=0; i<states.length; i++){%>
+                        <option value="<%=states[i].id%>"><%=states[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
         </div>
-    </div>
-</form>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8 text-left">
+                <input class="btn btn-default" onclick="submitRegistrationForm()" value="Submit"/>
+            </div>
+        </div>
+    </form>
 
-<script>
-    function submitRegistrationForm(){
-        $.post("register",
-            {
-                username: $("#username").val(),
-                password1: $("#password1").val(),
-                password2: $("#password2").val(),
-                city: $("#city").val(),
-                state: $("#state").val(),
-            },
-            function(data, status){
-                window.location.href = data.redirect;
-            }).fail(function(data, status) {
-                $("#message").text(data.responseJSON.message);
-            });
-    }
-</script>
-
-<%if (status) { %>
-    Please, login <a href="/login">here.</a>
-<% } %>
+    <script>
+        function submitRegistrationForm(){
+            $.post("register",
+                {
+                    username: $("#username").val(),
+                    password1: $("#password1").val(),
+                    password2: $("#password2").val(),
+                    city: $("#city").val(),
+                    state: $("#state").val(),
+                },
+                function(data, status){
+                    window.location.href = data.redirect;
+                }).fail(function(data, status) {
+                    $("#message").text(data.responseJSON.message);
+                });
+        }
+    </script>
 </div>
 <div class="col-sm-2"></div>
 <% include partial/footer %>

@@ -31,26 +31,32 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
    	});
 
    	app.post("/login", function (req, res, next) {
+		var username = req.body.username ? req.body.username : "";
+		var password = req.body.password ? req.body.password : "";
 
-   		var userName = "User";
-   		var hash = "passwordHashByBcrypr";
-
-   		var login = req.body.login ? req.body.login : "";
-   		var password = req.body.password ? req.body.password : "";
-
-		if(login === userName){
-			bcrypt.compare(password, hash, function(err, result) {
-				if(result) {
-					req.session.authenticated = true;
-					res.redirect("/");
+		if(username != ""){
+			dbClient.query("select * from users where username = '" + username + "'", (err, result) => {
+				if (err){
+					handleError("Error to find user in DB: " + err);
+				} else if(result.rows.length > 0) {
+					var user = result.rows[0];
+					bcrypt.compare(password, user.password, function(errBcrypt, resultBcrypt) {
+						if(resultBcrypt) {
+							req.session.user = user.id;
+							req.session.authenticated = true;
+							res.status(200).send({"message" : "user authorised: " + user.id, "locals" : {"user" : user.id}, "redirect" : "/"});
+						} else {
+							res.status(400).send({"message" : "Password is incorrenct."});
+						}
+					});
 				} else {
-					res.render("login", {"message" : "Password is incorrect."});
+					res.status(400).send({"message" : "No such username in the database."});
 				}
 			});
 		} else {
-			res.render("login", {"message" : "Login is incorrect."});
+			res.status(400).send({"message" : "Username should not be empty."});
 		}
-    });
+	});
 
     app.get("/logout", function (req, res, next) {
 		if (req.session) {
@@ -69,7 +75,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 			if (err){
 				handleError("Error to get states list: " + err);
 			} else {
-				res.render("registration", {"message" : "", "status" : false, "states" : result.rows});
+				res.render("registration", {"message" : "", "states" : result.rows});
 			}
 		});
     });
@@ -88,7 +94,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 					handleError("Error to check if user exists: " + errSelect);
 				} else {
 					if(resultSelect.rows.length > 0){
-						res.status(400).send({"message" : "This username is already exists.", "status" : false});
+						res.status(400).send({"message" : "This username is already exists."});
 					} else {
 						if(password1 == password2){
 							bcrypt.hash(password1, 10, function(err, passHash) {
@@ -98,7 +104,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 									} else {
 										req.session.user = resultInsert.rows[0]["id"];
 										req.session.authenticated = true;
-										res.status(200).send({"message" : "user registered: " + resultInsert.rows[0].id, "status" : true, "redirect" : "/", "locals" : {"user" : resultInsert.rows[0].id}});
+										res.status(200).send({"message" : "user registered successfully: " + resultInsert.rows[0].id, "redirect" : "/", "locals" : {"user" : resultInsert.rows[0].id}});
 									}
 								});
 							});
