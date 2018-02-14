@@ -1,0 +1,31 @@
+<% include partial/header %>
+
+<h2>My books: </h2>
+<ul>
+<% books.forEach(function(book){%>
+<li>
+    <img src="<%=book.picture%>" alt="<%=book.title%>"/>
+    <p><%=book.isbn%>, <%=book.title%>, <%=book.author%></p>
+    <button><%=book.id%> delete</button>
+</li>
+<% })%>
+</ul>
+<input id="isbn" type="text"/>
+<button id="addBook" onclick="addBook()">add</button>
+<p id="message"><%= message %></p>
+<script>
+    function addBook(){
+    console.log(isbn);
+        $.post("addbook",
+        {
+            isbn: $("#isbn").val(),
+        },
+        function(data, status){
+            window.location.href = data.redirect;
+        }).fail(function(data, status) {
+            $("#message").text(data.responseJSON.message);
+        });
+    }
+</script>
+
+<% include partial/footer %>

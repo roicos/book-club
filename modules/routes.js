@@ -3,7 +3,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 	app.use(express.static(path.join(__dirname, "../public")));
 
 	function checkAuth(req, res, next){
-		var permitRequiredUrls = ["/profile", "/mybooks",
+		var permitRequiredUrls = ["/profile", "/books",
 		"/addbook", "/deletebook", "requestbook", "/acceptrequest"];
 		if (permitRequiredUrls.indexOf(req.url) > -1  && (!req.session || !req.session.authenticated)) {
 			res.redirect("/login");
@@ -137,7 +137,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
     });
 
     app.post("/editprofile", function (req, res, next) {
-    
+
 		var userid = req.body.userid.trim();
 		var username = req.body.username.trim();
 		var password1 = req.body.password1.trim();
@@ -182,6 +182,71 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 		} else {
 			res.status(400).send({"message" : "Username and city should not be empty."});
 		}
+	});
+
+	app.get("/books", checkAuth, function (req, res, next) {
+		var userId = req.session.user;
+		var query = "select * from usertobook as ub join books as b on (ub.bookId = b.id) where ub.userId = " + userId;
+		dbClient.query(query, (err, result) => {
+			if (err){
+				handleError("Error to get user books: " + err);
+			} else {
+				res.render("books", {"books" : result.rows, "message" : ""});
+			}
+		});
+	});
+
+	app.post("/addbook", checkAuth, function (req, res, next) {
+		var userId = req.session.user;
+		var isbn = req.body.isbn.trim();
+
+		dbClient.query("select * from books where isbn = '" + isbn + "'", (errSelectBook, resultSelectBook) => {
+			if (errSelectBook){
+				handleError("Error to get book from db: " + errSelectBook);
+			} else {
+				if(resultSelectBook.rows > 0){ // book is already in db
+				console.log(resultSelectBook.rows[0]);
+					dbClient.query("insert into usertobook (userId, bookId) values (" + userId + ", " + resultSelectBook.rows[0].id+ ") returning id", (errAddUserToBook, resultAddUserToBook) => {
+						if (errAddUserToBook){
+							handleError("Error to add user to book: " + errAddUserToBook);
+						} else {
+							res.status(200).send({"message" : "You succesfully added book: " + resultSelectBook.rows[0].title, "redirect" : "books"});
+						}
+					});
+				} else { // if not - look in google and add to db
+					var books = require('google-books-search');
+
+                    books.search('isbn:'+isbn, function(errorBookSearch, resultsBookSearch) {
+						if (errorBookSearch ) {
+							handleError("Error book search: " + errorBookSearch);
+						} else {
+							if(resultsBookSearch.length > 0){
+								var title = resultsBookSearch[0].title;
+								var authors = resultsBookSearch[0].authors != undefined ? resultsBookSearch[0].authors.join(", ") : "";
+								var picture = resultsBookSearch[0].thumbnail;
+
+								dbClient.query("insert into books (isbn, picture, title, authors) values ('" + isbn + "', '" + picture + "', '" + title + "', '" + authors + "') returning id", (errorInsertBook, resultInsertBook) => {
+									if(errorInsertBook){
+										handleError("Error insert book: " + errorInsertBook);
+									} else {
+										console.log(resultInsertBook.rows[0]);
+										dbClient.query("insert into usertobook (userId, bookId) values (" + userId + ", " + resultInsertBook.rows[0].id+ ")", (errAddUserToBook, resultAddUserToBook) => {
+											if (errAddUserToBook){
+												handleError("Error to add user to book: " + errAddUserToBook);
+											} else {
+												res.status(200).send({"message" : "You succesfully added book: " + title, "redirect" : "books"});
+											}
+										});
+									}
+								});
+							} else {
+								res.status(400).send({"message" : "No book was found with such ISBN."});
+							}
+						}
+					});
+				}
+			}
+		});
 	});
 
    	app.get("*", function(req, res){
