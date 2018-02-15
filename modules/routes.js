@@ -205,7 +205,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 				handleError("Error to get book from db: " + errSelectBook);
 			} else {
 				if(resultSelectBook.rows > 0){ // book is already in db
-				console.log(resultSelectBook.rows[0]);
 					dbClient.query("insert into usertobook (userId, bookId) values (" + userId + ", " + resultSelectBook.rows[0].id+ ") returning id", (errAddUserToBook, resultAddUserToBook) => {
 						if (errAddUserToBook){
 							handleError("Error to add user to book: " + errAddUserToBook);
@@ -215,7 +214,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 					});
 				} else { // if not - look in google and add to db
 					var books = require('google-books-search');
-
                     books.search('isbn:'+isbn, function(errorBookSearch, resultsBookSearch) {
 						if (errorBookSearch ) {
 							handleError("Error book search: " + errorBookSearch);
@@ -229,7 +227,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 									if(errorInsertBook){
 										handleError("Error insert book: " + errorInsertBook);
 									} else {
-										console.log(resultInsertBook.rows[0]);
 										dbClient.query("insert into usertobook (userId, bookId) values (" + userId + ", " + resultInsertBook.rows[0].id+ ")", (errAddUserToBook, resultAddUserToBook) => {
 											if (errAddUserToBook){
 												handleError("Error to add user to book: " + errAddUserToBook);

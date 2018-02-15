@@ -1,21 +1,45 @@
 <% include partial/header %>
 
-<h2>My books: </h2>
-<ul>
-<% books.forEach(function(book){%>
-<li>
-    <img src="<%=book.picture%>" alt="<%=book.title%>"/>
-    <p><%=book.isbn%>, <%=book.title%>, <%=book.author%></p>
-    <button><%=book.id%> delete</button>
-</li>
-<% })%>
+<h2 class="text-center">My books: </h2>
+
+<div class="row">
+        <div class="col-sm-4"></div>
+        <div class="form-group col-sm-4 text-center">
+            <input class="form-control" id="isbn" type="text" placeholder="Enter ISBN"/>
+        </div>
+        <div class="col-sm-4"><button type="button" class="btn btn-secondary"" id="addBook" onclick="addBook()">Add new book</button></div>
+</div>
+<div class="row">
+    <div class="col-sm-4"></div>
+    <div class="form-group col-sm-4 text-center">
+        <p id="message"><%= message %></p>
+    </div>
+    <div class="col-sm-4"></div>
+</div>
+
+<ul id="mybooks">
+<% for (var i = 0; i < books.length; i++) {%>
+    <% if(i%2 == 0){%>
+        <div class="row">
+    <%}%>
+        <li class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-4 text-center"><img src="<%=books[i].picture%>" alt="<%=books[i].title%>"/></div>
+                <div class="col-sm-7">
+                    <p><strong>Title:</strong> <%=books[i].title%><p>
+                    <p><strong>Authors:</strong> <%=(books[i].authors == "" ? "-" : books[i].authors)%></p>
+                    <p><strong>ISBN:</strong> <%=books[i].isbn%></p>
+                </div>
+                <div class="col-sm-1"><i id="deleteBook" class="fas fa-trash-alt"></i></div>
+            </div>
+        </li>
+    <% if(i%2 == 1){%>
+    </div>
+    <%}%>
+<% }%>
 </ul>
-<input id="isbn" type="text"/>
-<button id="addBook" onclick="addBook()">add</button>
-<p id="message"><%= message %></p>
 <script>
     function addBook(){
-    console.log(isbn);
         $.post("addbook",
         {
             isbn: $("#isbn").val(),

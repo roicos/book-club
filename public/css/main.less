@@ -4,6 +4,7 @@
 @red: #F20000;
 @yellow: #C0A12D;
 @grey: #9D9E97;
+@lightGrey: #F7F7F7;
 
 html, body {
 	margin:0;
@@ -66,6 +67,12 @@ h1{
 	margin: 7px 0 0 0;
 }
 
+h2{
+	color: @red;
+	font-weight: bold;
+	font-size: 40px;
+}
+
 .book{
 	border: 3px solid transparent;
 	border-radius: 3px;
@@ -73,6 +80,39 @@ h1{
 
 .book:hover{
 	border: 3px solid @yellow;
+}
+
+#addBook{
+	margin-bottom: 15px;
+}
+
+#mybooks{
+	list-style: none;
+	font-family: 'Arial';
+	font-size: 14px;
+}
+
+#mybooks li{
+	padding: 10px 0;
+	border-left: 3px solid transparent;
+	position: relative;
+}
+
+#mybooks li:hover{
+	background-color: @lightGrey;
+	border-left: 3px solid @yellow;
+	cursor: pointer;
+}
+
+#mybooks li #deleteBook{
+	position: absolute;
+	top: 10px;
+	right: 30px;
+	color: @grey;
+}
+
+#mybooks li #deleteBook:hover{
+	color: @red;
 }
 
 .form-control{
@@ -98,11 +138,18 @@ form {
 	padding: 20px 0;
 }
 
-input.btn{
-	font-size: 30px;
+button, input.btn{
+	font-family: 'Arial';
+    font-size: 14px;
+}
+
+button:hover, input.btn:hover{
+    background-color: @lightGrey;
 }
 
 #message{
 	color: @red;
-	margin: 20px 0 0 0;
+	margin: 20px 0 20px 0;
+	font-family: 'Arial';
+	font-size: 14px;
 }
