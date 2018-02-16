@@ -204,7 +204,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 			if (errSelectBook){
 				handleError("Error to get book from db: " + errSelectBook);
 			} else {
-				if(resultSelectBook.rows > 0){ // book is already in db
+				if(resultSelectBook.rows.length > 0){ // book is already in db
 					dbClient.query("insert into usertobook (userId, bookId) values (" + userId + ", " + resultSelectBook.rows[0].id+ ") returning id", (errAddUserToBook, resultAddUserToBook) => {
 						if (errAddUserToBook){
 							handleError("Error to add user to book: " + errAddUserToBook);
