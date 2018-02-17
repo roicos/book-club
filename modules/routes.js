@@ -23,7 +23,42 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
     });
 
 	app.get("/", checkAuth, function (req, res, next) {
-    		res.render("index");
+			dbClient.query("select * from books join usertobook as ub on (books.id = ub.bookId) join users on (ub.userId = users.id) join states on (users.stateId = states.id) order by books.id desc", (err, result) => {
+				if (err){
+					handleError("Error to get books list: " + err);
+				} else {
+					var data = [];
+					var currentBookId = 0;
+					for(var i=0; i<result.rows.length; i++){
+						console.log(result.rows[i]);
+						if(currentBookId != result.rows[i].bookid){
+							data.push({
+								"title" : result.rows[i].title,
+								"authors" : result.rows[i].authors,
+								"isbn" : result.rows[i].isbn,
+								"picture" : result.rows[i].picture,
+								"users" : []
+							});
+
+							data[data.length-1].users.push({
+								"username" : result.rows[i].username,
+								"city" : result.rows[i].city,
+								"state": result.rows[i].name,
+								"usertobookId" : result.rows[i].id
+							});
+							currentBookId = result.rows[i].bookid;
+						} else {
+							data[data.length-1].users.push({
+								"username" : result.rows[i].username,
+								"city" : result.rows[i].city,
+								"state": result.rows[i].name,
+								"usertobookId" : result.rows[i].id
+							});
+						}
+					}
+					res.render("index", {"books" : data});
+				}
+			});
     });
 
 	app.get("/login", function (req, res, next) {
@@ -199,7 +234,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 	app.post("/addbook", checkAuth, function (req, res, next) {
 		var userId = req.session.user;
 		var isbn = req.body.isbn.trim();
-
 		dbClient.query("select * from books where isbn = '" + isbn + "'", (errSelectBook, resultSelectBook) => {
 			if (errSelectBook){
 				handleError("Error to get book from db: " + errSelectBook);
@@ -222,7 +256,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 								var title = resultsBookSearch[0].title;
 								var authors = resultsBookSearch[0].authors != undefined ? resultsBookSearch[0].authors.join(", ") : "";
 								var picture = resultsBookSearch[0].thumbnail;
-
 								dbClient.query("insert into books (isbn, picture, title, authors) values ('" + isbn + "', '" + picture + "', '" + title + "', '" + authors + "') returning id", (errorInsertBook, resultInsertBook) => {
 									if(errorInsertBook){
 										handleError("Error insert book: " + errorInsertBook);

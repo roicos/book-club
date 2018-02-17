@@ -1,43 +1,42 @@
 <% include partial/header %>
-
-    <div class="row">
+    <div id = "allBooks">
+    <% for (var i = 0; i < books.length; i++) {%>
+        <% if(i%6 == 0){%>
+            <div class="row">
+        <%}%>
         <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
+            <img src="<%=(books[i].picture != '' ? books[i].picture : '/img/default_book.jpeg')%>" height="200" alt="<%=books[i].title%>"
+                 data-title="<%=books[i].title%>" data-authors="<%=books[i].authors%>"
+                 data-isbn="<%=books[i].isbn%>" data-picture="<%=books[i].picture%>"
+                 data-toggle="modal" data-target="#requestModal"/>
+            <table class="bookUsers">
+                <%for( var j=0; j < books[i].users.length; j++){%>
+                    <tr>
+                        <td><%=books[i].users[j].username%></td>
+                        <td><%=books[i].users[j].city%></td>
+                        <td><%=books[i].users[j].state%></td>
+                        <td><button class="btn" id="utb-<%=books[i].users[j].usertobookId%>">request</button></td>
+                    </tr>
+                <%}%>
+            </table>
         </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
-        <div class="col-sm-2 col-md-2 book text-center">
-            <img src="/img/default_book.jpeg" height="200" alt="book"/>
-        </div>
+        <% if(i%6 == 5){%>
+            </div>
+        <%}%>
+    <% }%>
     </div>
 <% include partial/footer %>
+<% include partial/modal %>
+
+<script>
+    $(".bookUsers").hide();
+
+    $(".book img").click(function () {
+         $("#bookTitle").text($(this).data('title'));
+         $("#bookAuthors").text($(this).data('authors'));
+         $("#bookISBN").text($(this).data('isbn'));
+         $("#bookPicture").attr({"src":($(this).data('picture') != "" ? $(this).data('picture') : '/img/default_book.jpeg'), "alt":$(this).data('title')});
+         $("#bookUsers").html($(this).next().html());
+    });
+
+</script>
