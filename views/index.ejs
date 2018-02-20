@@ -9,13 +9,13 @@
                  data-title="<%=books[i].title%>" data-authors="<%=books[i].authors%>"
                  data-isbn="<%=books[i].isbn%>" data-picture="<%=books[i].picture%>"
                  data-toggle="modal" data-target="#requestModal"/>
-            <table class="bookUsers">
+            <table class="bookUsers" width="100%">
                 <%for( var j=0; j < books[i].users.length; j++){%>
                     <tr>
                         <td><%=books[i].users[j].username%></td>
                         <td><%=books[i].users[j].city%></td>
                         <td><%=books[i].users[j].state%></td>
-                        <td><button class="btn" id="utb-<%=books[i].users[j].usertobookId%>">request</button></td>
+                        <td><button class="btn btn-xs" id="utb-<%=books[i].users[j].usertobookId%>">request</button></td>
                     </tr>
                 <%}%>
             </table>

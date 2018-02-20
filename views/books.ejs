@@ -30,7 +30,7 @@
                     <p><strong>Authors:</strong> <%=(books[i].authors == "" ? "-" : books[i].authors)%></p>
                     <p><strong>ISBN:</strong> <%=books[i].isbn%></p>
                 </div>
-                <div class="col-sm-1"><i id="deleteBook" class="fas fa-trash-alt"></i></div>
+                <div class="col-sm-1"><i id="deleteBook-<%=ubid%>" class="fas fa-trash-alt"></i></div>
             </div>
         </li>
     <% if(i%2 == 1){%>

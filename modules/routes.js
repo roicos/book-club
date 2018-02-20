@@ -23,14 +23,13 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
     });
 
 	app.get("/", checkAuth, function (req, res, next) {
-			dbClient.query("select * from books join usertobook as ub on (books.id = ub.bookId) join users on (ub.userId = users.id) join states on (users.stateId = states.id) order by books.id desc", (err, result) => {
+			dbClient.query("select *, ub.id as ubid from books join usertobook as ub on (books.id = ub.bookId) join users on (ub.userId = users.id) join states on (users.stateId = states.id) order by books.id desc", (err, result) => {
 				if (err){
 					handleError("Error to get books list: " + err);
 				} else {
 					var data = [];
 					var currentBookId = 0;
 					for(var i=0; i<result.rows.length; i++){
-						console.log(result.rows[i]);
 						if(currentBookId != result.rows[i].bookid){
 							data.push({
 								"title" : result.rows[i].title,
@@ -44,7 +43,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 								"username" : result.rows[i].username,
 								"city" : result.rows[i].city,
 								"state": result.rows[i].name,
-								"usertobookId" : result.rows[i].id
+								"usertobookId" : result.rows[i].ubid
 							});
 							currentBookId = result.rows[i].bookid;
 						} else {
@@ -52,7 +51,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 								"username" : result.rows[i].username,
 								"city" : result.rows[i].city,
 								"state": result.rows[i].name,
-								"usertobookId" : result.rows[i].id
+								"usertobookId" : result.rows[i].ubid
 							});
 						}
 					}
@@ -221,7 +220,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	app.get("/books", checkAuth, function (req, res, next) {
 		var userId = req.session.user;
-		var query = "select * from usertobook as ub join books as b on (ub.bookId = b.id) where ub.userId = " + userId;
+		var query = "select *, ub.id as ubid from usertobook as ub join books as b on (ub.bookId = b.id) where ub.userId = " + userId;
 		dbClient.query(query, (err, result) => {
 			if (err){
 				handleError("Error to get user books: " + err);
@@ -274,6 +273,46 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 							}
 						}
 					});
+				}
+			}
+		});
+	});
+
+	app.get("/deletebook", checkAuth, function (req, res, next) {
+		var userId = req.session.user;
+		var id = req.body.ubid.trim();
+
+		// TODO: check if there are no requests
+
+		dbClient.query("select count(*) from requests where usertobook = " + id, (errCountRequests, resultCountRequests) => {
+			if (err){
+				handleError("Error to count requests: " + errCountRequests);
+			} else {
+				if(resultCountRequests.rows[0].count == 0){
+					dbClient.query("delete from usertobook where id = " + id + " returning bookId", (errDelete, resultDelete) => {
+						if (err){
+							handleError("Error to delete book: " + errDelete);
+						} else {
+							var bookId = resultDelete.rows[0].bookId;
+							dbClient.query("select count(*) from usertobook where bookId = " + bookId + "", (errSelect, resultSelect) => {
+								if (err){
+									handleError("Error to find book: " + errSelect);
+								} else {
+									if(resultSelect.rows[0].count == 0){
+										dbClient.query("delete from books where id = " + bookId, (errDeleteBook, resultDeleteBook) => {
+											if (err){
+												handleError("Error to delete book: " + errDeleteBook);
+											} else {
+												res.status(200).send({"message" : "book deleted", "redirect" : "/books"})
+											}
+										});
+									}
+								}
+							});
+						}
+					});
+				} else {
+					res.status(400).send({"message" : "There are requests for this book. book can not be deleted"});
 				}
 			}
 		});
