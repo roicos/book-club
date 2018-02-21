@@ -4,9 +4,13 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	function checkAuth(req, res, next){
 		var permitRequiredUrls = ["/profile", "/books",
-		"/addbook", "/deletebook", "requestbook", "/acceptrequest"];
+		"/addbook", "/deletebook", "/requestbook", "/acceptrequest"];
 		if (permitRequiredUrls.indexOf(req.url) > -1  && (!req.session || !req.session.authenticated)) {
-			res.redirect("/login");
+			if(req.xhr){ // ajax request
+				res.status(400).send({"message" : "You are not logged in", "redirect" : "login"});
+			} else {
+				res.redirect("/login");
+			}
 		} else {
 			next();
 		}
@@ -315,6 +319,21 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 				} else {
 					res.status(400).send({"message" : "There are requests for this book. book can not be deleted"});
 				}
+			}
+		});
+	});
+
+	app.post("/requestbook", checkAuth, function (req, res, next) {
+		var userId = req.session.user;
+		var ubid = req.body.ubid.trim();
+
+		var query = "insert into requests (usertobook, userid, status, created, updated)"
+					+ "values ('"+ ubid + "', '"+ userId + "', 'open', now() , now() ) returning *";
+		dbClient.query(query, (errInsert, resultInsert) => {
+			if (errInsert){
+				handleError("Error to insert new request: " + errInsert, res);
+			} else {
+				res.status(200).send({"message" : "book requested successfully: " + resultInsert.rows[0].id, "redirect" : "/"});
 			}
 		});
 	});

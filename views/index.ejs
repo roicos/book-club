@@ -15,7 +15,7 @@
                         <td><%=books[i].users[j].username%></td>
                         <td><%=books[i].users[j].city%></td>
                         <td><%=books[i].users[j].state%></td>
-                        <td><button class="btn btn-xs" id="utb-<%=books[i].users[j].usertobookId%>">request</button></td>
+                        <td><button class="btn btn-xs" onclick="requestBook(<%=books[i].users[j].usertobookId%>)" id="ubid-<%=books[i].users[j].usertobookId%>">request</button></td>
                     </tr>
                 <%}%>
             </table>
@@ -39,4 +39,20 @@
          $("#bookUsers").html($(this).next().html());
     });
 
+    function requestBook(ubid){
+        $.post("requestbook",
+        {
+            ubid: ubid,
+        },
+        function(data, status){
+            window.location.href = data.redirect;
+        }).fail(function(data, status) {
+            $("#message").text(data.responseJSON.message);
+            if(data.responseJSON.redirect){
+                setTimeout(function(){
+                window.location.href = data.responseJSON.redirect;
+                }, 1000);
+            }
+        });
+    }
 </script>

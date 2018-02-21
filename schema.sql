@@ -64,4 +64,4 @@ Create table if not exists usertobook (id serial primary key, userid int not nul
 
 Create type status as enum('open', 'closed', 'rejected');
 
-Create table if not exists requests (id serial primary key, usertobook int not null, rstatus status default 'open', created timestamp, updated timestamp);
+Create table if not exists requests (id serial primary key, usertobook int not null, userid int not null, status status default 'open', created timestamp, updated timestamp);
