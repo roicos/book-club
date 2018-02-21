@@ -60,7 +60,7 @@ Create table if not exists users (id serial primary key, username varchar(100) n
 
 Create table if not exists books (id serial primary key, isbn varchar(20) not null, picture varchar (225), title varchar (255) not null, authors varchar (255) not null);
 
-Create table if not exists usertobook (id serial primary key, userId int not null, bookId int not null);
+Create table if not exists usertobook (id serial primary key, userid int not null, bookid int not null);
 
 Create type status as enum('open', 'closed', 'rejected');
 
