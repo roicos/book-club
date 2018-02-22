@@ -115,7 +115,7 @@ h2{
 	color: @red;
 }
 
-.form-control, .modal{
+.form-control, .modal, .content{
 	font-family: 'Arial';
     font-size: 14px;
 }
@@ -128,13 +128,13 @@ h2{
 	width: 100%;
 }
 
-#bookUsers tbody {
+#bookUsers tbody, #requests tbody {
 	display: table;
 	width: 100%;
 }
 
-#bookUsers tbody td{
-	padding: 5px;
+#bookUsers tbody td, #requests tbody td, th{
+	padding: 5px 10px;
 }
 
 h6{
@@ -143,6 +143,14 @@ h6{
 
 #requestModal #bookTitle{
 	float: left;
+}
+
+#requests{
+	margin-top: 20px;
+}
+
+#requests h4{
+	color: @red;
 }
 
 #footer{

@@ -1,0 +1,85 @@
+<% include partial/header %>
+
+<div class="row content" id="requests">
+        <h4 class="text-center">Books requested from me</h4><br/>
+        <%if(requested.length == 0){%>
+            <p class="text-center">You currently don't have any requests</p>
+        <%} else {%>
+            <table width="100%">
+                <tr class="text-center">
+                    <th>Book</th>
+                    <th>Requested by</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Last updated</th>
+                </tr>
+                <%for (var i=0; i<requested.length; i++){%>
+                <tr>
+                    <td><%=requested[i].title%></td>
+                    <td><%=requested[i].username%></td>
+                    <td><%=requested[i].city%>, <%=requested[i].code%></td>
+                    <td><%=requested[i].status%></td>
+                    <td class="date"><%=requested[i].created%></td>
+                    <td class="date"><%=requested[i].updated%></td>
+                    <td><button class="btn btn-xs" onclick="accept(<%=requested[i].id%>)">accept</button></td>
+                    <td><button class="btn btn-xs" onclick="deny(<%=requested[i].id%>)">deny</button></td>
+                </tr>
+                <%}%>
+            </table>
+        <%}%>
+        <br/><br/>
+
+        <h4 class="text-center">My requests</h4><br/>
+        <%if(my.length == 0){%>
+            <p class="text-center">You currently don't have any requests</p>
+        <%} else {%>
+
+            <table width="100%">
+                <tr class="text-center">
+                   <th>Book</th>
+                   <th>User</th>
+                   <th>Location</th>
+                   <th>Status</th>
+                   <th>Created</th>
+                   <th>Last updated</th>
+                </tr>
+                <%for (var i=0; i<my.length; i++){%>
+                <tr>
+                    <td><%=my[i].title%></td>
+                    <td><%=my[i].username%></td>
+                    <td><%=my[i].city%>, <%=my[i].code%></td>
+                    <td><%=my[i].status%></td>
+                    <td class="date"><%=my[i].created%></td>
+                    <td class="date"><%=my[i].updated%></td>
+                    <td><button class="btn btn-xs" onclick="delete(<%=my[i].id%>)">delete</button></td>
+                </tr>
+                <%}%>
+            </table>
+        <%}%>
+</div>
+<script>
+    $(".date").each(function(index){
+        $(this).text(formatDate($(this).html()));
+    });
+
+    function formatDate(date) {
+    var d = new Date(date);
+
+        month = '' + (d.getMonth() + 1);
+        day = '' + d.getDate();
+        year = d.getFullYear();
+
+        hour = '' + d.getHours();
+        minute = '' + d.getMinutes();
+        seconds = '' + d.getSeconds();
+
+        return year + "-" + day + "-" + month + " " + hour + ":" + minute + ":" + seconds;
+    }
+
+</script>
+
+
+
+
+<% include partial/footer %>

@@ -56,7 +56,7 @@ Insert into states (name, code) values
 	('Wisconsin', 'WI'),
 	('Wyoming', 'WY');
 
-Create table if not exists users (id serial primary key, username varchar(100) not null, password varchar(255) not null, city varchar (255) not null, stateId int);
+Create table if not exists users (id serial primary key, username varchar(100) not null, password varchar(255) not null, city varchar (255) not null, stateid int);
 
 Create table if not exists books (id serial primary key, isbn varchar(20) not null, picture varchar (225), title varchar (255) not null, authors varchar (255) not null);
 

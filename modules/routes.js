@@ -4,7 +4,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	function checkAuth(req, res, next){
 		var permitRequiredUrls = ["/profile", "/books",
-		"/addbook", "/deletebook", "/requestbook", "/acceptrequest"];
+		"/addbook", "/deletebook", "/requestbook", "/requests", "/acceptrequest"];
 		if (permitRequiredUrls.indexOf(req.url) > -1  && (!req.session || !req.session.authenticated)) {
 			if(req.xhr){ // ajax request
 				res.status(400).send({"message" : "You are not logged in", "redirect" : "login"});
@@ -229,7 +229,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 			if (err){
 				handleError("Error to get user books: " + err, res);
 			} else {
-			console.log(result.rows);
 				res.render("books", {"books" : result.rows, "message" : ""});
 			}
 		});
@@ -334,6 +333,27 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 				handleError("Error to insert new request: " + errInsert, res);
 			} else {
 				res.status(200).send({"message" : "book requested successfully: " + resultInsert.rows[0].id, "redirect" : "/"});
+			}
+		});
+	});
+
+	app.get("/requests", checkAuth, function (req, res, next) {
+		var userId = req.session.user;
+		var queryRequested = "select * from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where ub.userid = " + userId + " order by r.updated desc";
+		dbClient.query(queryRequested, (errRequested, resultRequested) => {
+			if (errRequested){
+				handleError("Error to get requested books: " + errRequested, res);
+			} else {
+				var requested = resultRequested.rows;
+				var queryMy = "select * from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where r.userid = " + userId + " order by r.updated desc";
+				dbClient.query(queryMy, (errMy, resultMy) => {
+					if (errMy){
+						handleError("Error to get requests: " + errMy, res);
+					} else {
+						var myRequests = resultMy.rows;
+						res.render("requests", {"requested" : requested, "my" : myRequests});
+					}
+				});
 			}
 		});
 	});
