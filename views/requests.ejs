@@ -15,15 +15,23 @@
                     <th>Last updated</th>
                 </tr>
                 <%for (var i=0; i<requested.length; i++){%>
-                <tr>
+                <tr class="<%=requested[i].status%>">
                     <td><%=requested[i].title%></td>
                     <td><%=requested[i].username%></td>
                     <td><%=requested[i].city%>, <%=requested[i].code%></td>
                     <td><%=requested[i].status%></td>
                     <td class="date"><%=requested[i].created%></td>
                     <td class="date"><%=requested[i].updated%></td>
-                    <td><button class="btn btn-xs" onclick="accept(<%=requested[i].id%>)">accept</button></td>
-                    <td><button class="btn btn-xs" onclick="deny(<%=requested[i].id%>)">deny</button></td>
+                    <td>
+                        <%if (requested[i].status != 'closed'){%>
+                            <button class="btn btn-xs" onclick="changeStatus(<%=requested[i].rid%>, 'closed')">accept</button>
+                        <%}%>
+                    </td>
+                    <td>
+                        <%if (requested[i].status != 'rejected'){%>
+                            <button class="btn btn-xs" onclick="changeStatus(<%=requested[i].rid%>, 'rejected')">deny</button>
+                        <%}%>
+                    </td>
                 </tr>
                 <%}%>
             </table>
@@ -45,14 +53,14 @@
                    <th>Last updated</th>
                 </tr>
                 <%for (var i=0; i<my.length; i++){%>
-                <tr>
+                <tr class="<%=my[i].status%>">
                     <td><%=my[i].title%></td>
                     <td><%=my[i].username%></td>
                     <td><%=my[i].city%>, <%=my[i].code%></td>
                     <td><%=my[i].status%></td>
                     <td class="date"><%=my[i].created%></td>
                     <td class="date"><%=my[i].updated%></td>
-                    <td><button class="btn btn-xs" onclick="delete(<%=my[i].id%>)">delete</button></td>
+                    <td><button class="btn btn-xs" onclick="deleteRequest(<%=my[i].rid%>)">delete</button></td>
                 </tr>
                 <%}%>
             </table>
@@ -75,6 +83,31 @@
         seconds = '' + d.getSeconds();
 
         return year + "-" + day + "-" + month + " " + hour + ":" + minute + ":" + seconds;
+    }
+
+    function changeStatus(requestId, newStatus){
+        $.post("changerequeststatus",
+        {
+            id: requestId,
+            status: newStatus
+        },
+        function(data, status){
+            window.location.href = data.redirect;
+        }).fail(function(data, status) {
+            $("#message").text(data.responseJSON.message);
+        });
+    }
+
+    function deleteRequest(requestId){
+        $.post("deleterequest",
+        {
+            id: requestId,
+        },
+        function(data, status){
+            window.location.href = data.redirect;
+        }).fail(function(data, status) {
+            $("#message").text(data.responseJSON.message);
+        });
     }
 
 </script>

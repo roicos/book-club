@@ -1,10 +1,11 @@
-/*https://www.templatemonster.com/website-templates/46251.html*/
 @white: #fff;
 @black: #272727;
 @red: #F20000;
 @yellow: #C0A12D;
 @grey: #9D9E97;
 @lightGrey: #F7F7F7;
+@lightYellow: #fffbe5;
+@lightGreen: #e5f2e5;
 
 html, body {
 	margin:0;
@@ -151,6 +152,19 @@ h6{
 
 #requests h4{
 	color: @red;
+}
+
+#requests .open{
+	background-color: @lightYellow;
+}
+
+#requests .closed{
+	background-color: @lightGreen;
+}
+
+
+#requests .rejected{
+	background-color: @lightGrey;
 }
 
 #footer{

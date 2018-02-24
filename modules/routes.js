@@ -4,10 +4,10 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	function checkAuth(req, res, next){
 		var permitRequiredUrls = ["/profile", "/books",
-		"/addbook", "/deletebook", "/requestbook", "/requests", "/acceptrequest"];
+		"/addbook", "/deletebook", "/requestbook", "/requests", "/changerequeststatus", "/deleterequest"];
 		if (permitRequiredUrls.indexOf(req.url) > -1  && (!req.session || !req.session.authenticated)) {
 			if(req.xhr){ // ajax request
-				res.status(400).send({"message" : "You are not logged in", "redirect" : "login"});
+				res.status(400).send({"message" : "You must be logged in for this action", "redirect" : "login"});
 			} else {
 				res.redirect("/login");
 			}
@@ -286,8 +286,6 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 		var userId = req.session.user;
 		var id = req.body.id.trim();
 
-		// TODO: check if there are no requests
-
 		dbClient.query("select count(*) from requests where usertobook = " + id, (errCountRequests, resultCountRequests) => {
 			if (errCountRequests){
 				handleError("Error to count requests: " + errCountRequests, res);
@@ -316,7 +314,7 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 						}
 					});
 				} else {
-					res.status(400).send({"message" : "There are requests for this book. book can not be deleted"});
+					res.status(400).send({"message" : "Can not delete the book: there are requests for this book."});
 				}
 			}
 		});
@@ -339,13 +337,13 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 
 	app.get("/requests", checkAuth, function (req, res, next) {
 		var userId = req.session.user;
-		var queryRequested = "select * from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where ub.userid = " + userId + " order by r.updated desc";
+		var queryRequested = "select *, r.id as rid from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where ub.userid = " + userId + " order by r.status, r.updated desc";
 		dbClient.query(queryRequested, (errRequested, resultRequested) => {
 			if (errRequested){
 				handleError("Error to get requested books: " + errRequested, res);
 			} else {
 				var requested = resultRequested.rows;
-				var queryMy = "select * from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where r.userid = " + userId + " order by r.updated desc";
+				var queryMy = "select *, r.id as rid from requests as r join usertobook as ub on (r.usertobook = ub.id) join books as b on (ub.bookid = b.id) join users as u on (u.id = r.userid) join states on (u.stateid = states.id) where r.userid = " + userId + " order by r.status, r.updated desc";
 				dbClient.query(queryMy, (errMy, resultMy) => {
 					if (errMy){
 						handleError("Error to get requests: " + errMy, res);
@@ -354,6 +352,33 @@ module.exports = function (express, app, path, bcrypt, dbClient) {
 						res.render("requests", {"requested" : requested, "my" : myRequests});
 					}
 				});
+			}
+		});
+	});
+
+	app.post("/changerequeststatus", checkAuth, function (req, res, next) {
+		var id = req.body.id.trim();
+		var newStatus = req.body.status.trim();
+
+		var query = "update requests set status = '" + newStatus + "' where id = " + id;
+		dbClient.query(query, (err, result) => {
+			if (err){
+				handleError("Error to change request status: " + err, res);
+			} else {
+				res.status(200).send({"message" : "request " + newStatus + " successfully" , "redirect" : "requests"});
+			}
+		});
+	});
+
+	app.post("/deleterequest", checkAuth, function (req, res, next) {
+		var id = req.body.id.trim();
+
+		var query = "delete from requests where id = " + id;
+		dbClient.query(query, (err, result) => {
+			if (err){
+				handleError("Error to delete request: " + err, res);
+			} else {
+				res.status(200).send({"message" : "request deleted successfully" , "redirect" : "requests"});
 			}
 		});
 	});
